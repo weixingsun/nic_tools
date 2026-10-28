@@ -45,7 +45,7 @@ the work that used to sit in locks and system calls is gone.
 | Step | Messages/s | 2-hops latency (p50 / p99) | Data integrity |
 |---|---|---|---|
 | Kernel TCP (measured) | 2.0 M | 385 µs / 24.6 ms | |
-| libnetacc, four queues | **9.0 M** sustained (10 M peak) | **~105 µs / ~200 µs** | **0 errors** in 24 hours soak |
+| libnetacc + relay | **9.0 M** sustained (10 M peak) | **~105 µs / ~200 µs** | **0 errors** in 24 hours soak |
 
 ---
 
