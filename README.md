@@ -6,7 +6,7 @@ connections run over a high-performance userspace TCP stack that talks to the NI
 Everything else on the host keeps using the normal kernel network stack. single NIC works
 
 ```
-LD_PRELOAD=libnetacc.so  <elf-binary> <options>
+./libnetacc  <elf-binary> <options>
 ```
 ---
 
