@@ -36,27 +36,16 @@ A three-stage message chain — a producer, a relay and a consumer, each a separ
 machine — carrying 1 KB messages, with **every byte of every message verified** at the
 far end.
 
-| | |
-|---|---|
-| Throughput | **9.0 million messages/s, 73.7 Gbps**, sustained every second |
-| One-way latency, producer to consumer (two hops) | **p50 ~105-125 µs, p99 ~200-225 µs** |
-| Data integrity | **0 errors** in every run |
-| Endurance | **2-hour soaks with injected loss, duplication, reordering and corruption, and restarts: 0 data errors** (one soak alone: 27.7 billion messages verified) |
-| Kernel TCP, same chain | measured at 2.0 million messages/s |
-
 The relay is the hard part: it receives every message and sends it on, so it carries
 the full load twice. Under libnetacc its application threads are almost idle at 9 M:
 the work that used to sit in locks and system calls is gone.
 
-<details>
 <summary>How the 9 M pps with 1KB size packets figure</summary>
 
-| Step | Messages/s | 2-hops latency (p50 / p99) |
-|---|---|---|
-| Kernel TCP (measured) | 2.0 M | 385 µs / 24.6 ms ¹ |
-| libnetacc, four queues | **9.0 M** sustained (10 M peak) | **~105 µs / ~200 µs** |
-
-</details>
+| Step | Messages/s | 2-hops latency (p50 / p99) | Data integrity |
+|---|---|---|---|
+| Kernel TCP (measured) | 2.0 M | 385 µs / 24.6 ms | |
+| libnetacc, four queues | **9.0 M** sustained (10 M peak) | **~105 µs / ~200 µs** | **0 errors** in 24 hours soak |
 
 ---
 
@@ -66,7 +55,7 @@ the work that used to sit in locks and system calls is gone.
 |---|---|
 | **nginx** (unmodified, master + workers) | **2x kernel TCP** on the same workers (1.45 M against 0.71 M requests/s). With 4 workers, 1.49 M requests/s, the cloud instance's packet limit. p99 1.6 ms at 190 k requests/s. Reloads under load without refused connections. |
 | **valkey** (Redis protocol) | About the same throughput as kernel TCP (+2.5%) at the same p99 (0.135 ms), with far less CPU in its I/O threads. |
-| **Bulk feeds** | A single TCP connection is capped by the cloud network at ~9.6 Gbps. libnetacc can stripe one logical stream over several connections and carried ~3x more. |
+| **Bulk feeds** | A single TCP connection is capped by the cloud network at ~9.6 Gbps. libnetacc can stripe one logical stream over several connections and carried 3x more. |
 
 ---
 
@@ -83,9 +72,9 @@ the work that used to sit in locks and system calls is gone.
 Ordinary tools (`ss`, `tcpdump`) cannot see connections that bypass the kernel, so
 libnetacc brings its own:
 
-- **net_diag** — one command that checks a running program is on the fast path and says
+- **acc_diag** — one command that checks a running program is on the fast path and says
   what limits it.
-- **net_mon** — a live console: queues, NIC and cloud network limits, cores, every
+- **acc_mon** — a live console: queues, NIC and cloud network limits, cores, every
   connection's throughput, CPU hot spots, and safe live tuning of a running program.
 - **tcp_mon** — the same console for programs on kernel TCP, for side-by-side comparison.
 
