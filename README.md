@@ -6,7 +6,8 @@ connections run over a high-performance userspace TCP stack that talks to the NI
 Everything else on the host keeps using the normal kernel network stack. single NIC works
 
 ```
-./libnetacc  <elf-binary> <options>
+./libnetacc  <elf/java> <options>
+
 ```
 ---
 
@@ -23,8 +24,7 @@ libnetacc takes the traffic of the ports you choose off that path:
   messages, or the same load on fewer cores.
 - **Lower and steadier latency.** No interrupt-to-thread hand-off, and no system call
   per read or write.
-- **Nothing to port.** The program keeps its own `read()`, `write()`, `epoll` and
-  `accept()` calls. libnetacc answers them.
+- **Nothing to port.** The program keeps calling Linux network API, but libnetacc answers them.
 - **Contained.** Only the claimed ports go through it. SSH, monitoring and every other
   port stay on kernel TCP.
 
